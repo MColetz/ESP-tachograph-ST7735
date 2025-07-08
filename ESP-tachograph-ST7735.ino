@@ -1,21 +1,8 @@
 #define test
 
-
-#include <Adafruit_GFX.h>    // Core graphics library
-#include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
-#include <SPI.h>
-#include <SoftwareSerial.h>
-#include <TinyGPS.h>
-
-//  DIFINE PINS
-#define TFT_CS         5
-#define TFT_RST        4                                            
-#define TFT_DC         16
-#define TFT_SCLK       14
-#define TFT_MOSI       13
+#include "graphics.h"
 
 //DEFINE HARDWARE
-Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
 TinyGPS gps;
 SoftwareSerial ss(0, 2);
 
@@ -39,10 +26,9 @@ static void print_str(const char *str, int len);
 
 void setup(void) {
   Serial.begin(115200);
-  Serial.println("Initializing TFT SCREEN");
-  tft.initR(INITR_BLACKTAB);      // Init ST7735S chip, black tab
-  tft.fillScreen(ST77XX_BLACK);
-  Print_logo();
+
+  setup_graphics();
+
   Serial.println("Initializing GPS");
   ss.begin(9600);
   Screen_SM();
