@@ -1,164 +1,67 @@
-#define test
+#include <SoftwareSerial.h>
+#include "ESP-tachograph-ST7735.h"
 
-#include "graphics.h"
-
-//DEFINE HARDWARE
-TinyGPS gps;
-SoftwareSerial ss(0, 2);
-
-//DEFINE VARIABLES
-int last_data_age = 0;
-double maxgps_speed;
-double maxgps_alt;
-String heading;
-float p = 3.1415926;
-enum screen_SM_stats {HOME, STATS, CHRONO};
-screen_SM_stats screen_current_state = HOME;
-bool printed_title = false;
-
-//DEFINE FUNCTIONS
-static void smartdelay(unsigned long ms);
-static void print_float(float val, float invalid, int len, int prec);
-static void print_int(unsigned long val, unsigned long invalid, int len);
-static void print_date(TinyGPS &gps);
-static void print_str(const char *str, int len);
+static TinyGPS gps;
+static SoftwareSerial ss(0, 2);
 
 
-void setup(void) {
+#define TFT_CS 5
+#define TFT_RST 4
+#define TFT_DC 16
+#define TFT_SCLK 14
+#define TFT_MOSI 13
+
+static auto tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCLK, TFT_RST);
+static Display d;
+
+void setup() {
   Serial.begin(115200);
-
-  setup_graphics();
-
-  Serial.println("Initializing GPS");
+  Serial.println("init display chip");
+  tft.initR(INITR_BLACKTAB);      // Init ST7735S chip, black tab
+  tft.fillScreen(ST77XX_BLACK);
+  Serial.println("init tabs");
+  static Home home{&tft, &gps};
+  static Stat stat{&tft, &gps};
+  static Chrono chrono{&tft, &gps};
+  static std::array<Tab*, 3> tabs{&stat, &home, &chrono};
+  Serial.println("init display");
+  d = Display{tabs, &tft};
+   
   ss.begin(9600);
-  Screen_SM();
+  Serial.println("init done");
+  d.changeState(1);
+  Serial.println("Sats HDOP Latitude  Longitude  Fix  Date       Time     Date Alt    Course Speed Card  Chars Sentences Checksum");
+  Serial.println("          (deg)     (deg)      Age                      Age  (m)    --- from GPS ----  RX    RX        Fail");
+  Serial.println("----------------------------------------------------------------------------------------------------------------");
 }
+
 
 void loop() {
   float flat, flon;
   unsigned long age, date, time, chars = 0;
   unsigned short sentences = 0, failed = 0;
   gps.f_get_position(&flat, &flon, &age);
-  if(age > last_data_age){
-    last_data_age = age;
-  }else{
-    if( gps.satellites() == TinyGPS::GPS_INVALID_SATELLITES){
-      Serial.println("Looking for signal");
-    }else{
-      #ifdef test
-      if (printed_title == false){
-        #ifdef test
-        Serial.println("Sats HDOP Latitude  Longitude  Fix  Date       Time     Date Alt    Course Speed Card  Chars Sentences Checksum");
-        Serial.println("          (deg)     (deg)      Age                      Age  (m)    --- from GPS ----  RX    RX        Fail");
-        Serial.println("----------------------------------------------------------------------------------------------------------------");
-        printed_title = true;
-        #endif
-      }
-      print_int(gps.satellites(), TinyGPS::GPS_INVALID_SATELLITES, 5);
-      print_int(gps.hdop(), TinyGPS::GPS_INVALID_HDOP, 5);
-      gps.f_get_position(&flat, &flon, &age);
-      print_float(flat, TinyGPS::GPS_INVALID_F_ANGLE, 10, 6);
-      print_float(flon, TinyGPS::GPS_INVALID_F_ANGLE, 11, 6);
-      print_int(age, TinyGPS::GPS_INVALID_AGE, 5);
-      print_date(gps);
-      print_float(gps.f_altitude(), TinyGPS::GPS_INVALID_F_ALTITUDE, 7, 2);
-      print_float(gps.f_course(), TinyGPS::GPS_INVALID_F_ANGLE, 7, 2);
-      print_float(gps.f_speed_kmph(), TinyGPS::GPS_INVALID_F_SPEED, 6, 2);
-      print_str(gps.f_course() == TinyGPS::GPS_INVALID_F_ANGLE ? "*** " : TinyGPS::cardinal(gps.f_course()), 6);
-      gps.stats(&chars, &sentences, &failed);
-      print_int(chars, 0xFFFFFFFF, 6);
-      print_int(sentences, 0xFFFFFFFF, 10);
-      print_int(failed, 0xFFFFFFFF, 9);
-      Serial.println();
-      #endif
-      //Screen_SM();
-      }
-  }
-
+  print_int(gps.satellites(), TinyGPS::GPS_INVALID_SATELLITES, 5);
+  print_int(gps.hdop(), TinyGPS::GPS_INVALID_HDOP, 5);
+  gps.f_get_position(&flat, &flon, &age);
+  print_float(flat, TinyGPS::GPS_INVALID_F_ANGLE, 10, 6);
+  print_float(flon, TinyGPS::GPS_INVALID_F_ANGLE, 11, 6);
+  print_int(age, TinyGPS::GPS_INVALID_AGE, 5);
+  print_date(gps);
+  print_float(gps.f_altitude(), TinyGPS::GPS_INVALID_F_ALTITUDE, 7, 2);
+  print_float(gps.f_course(), TinyGPS::GPS_INVALID_F_ANGLE, 7, 2);
+  print_float(gps.f_speed_kmph(), TinyGPS::GPS_INVALID_F_SPEED, 6, 2);
+  print_str(gps.f_course() == TinyGPS::GPS_INVALID_F_ANGLE ? "*** " : TinyGPS::cardinal(gps.f_course()), 6);
+  gps.stats(&chars, &sentences, &failed);
+  print_int(chars, 0xFFFFFFFF, 6);
+  print_int(sentences, 0xFFFFFFFF, 10);
+  print_int(failed, 0xFFFFFFFF, 9);
+  Serial.println();
   smartdelay(100);
 
-
+  d.update_data();
 }
 
-void Print_logo(){
-  delay(100);
-}
-
-void Screen_SM(){
-  if(screen_current_state == HOME)
-  {
-    display_home();
-  }
-  else if(screen_current_state == STATS)
-  {
-    tft.setCursor(0, 0);
-    tft.println("STATS");
-    // Aggiungi altri dati utili
-  }
-  else if(screen_current_state == CHRONO)
-  {
-    tft.setCursor(0, 0);
-    tft.println("CHRONO");
-    // Logica per il cronometro
-  }
-}
-
-void display_home(){
-  tft.fillScreen(ST77XX_BLACK);
-  
-  // === HEADER (barra superiore) ===
-  tft.fillRect(0, 0, 128, 12, ST77XX_WHITE); // barra superiore vuota
-  
-  // === INFO SATELLITI E VELOCITÀ MASSIMA ===
-  tft.setTextColor(ST77XX_WHITE);
-  tft.setTextSize(1);
-  tft.setCursor(2, 14);
-  tft.print("Sats: ");
-  tft.print(gps.satellites());
-  
-  tft.setCursor(70, 14);
-  tft.print("Max: ");
-  tft.print(maxgps_speed, 1);
-  tft.print("k");
-
-  // === VELOCITÀ ATTUALE CENTRALE ===
-  float current_speed = gps.f_speed_kmph();
-  if (current_speed > maxgps_speed) maxgps_speed = current_speed;
-
-  tft.setTextSize(3);
-  tft.setCursor(20, 40);
-  tft.setTextColor(ST77XX_WHITE);
-  tft.print(current_speed, 1);
-
-  tft.setTextSize(1);
-  tft.setCursor(90, 60);
-  tft.print("km/h");
-
-  // === FOOTER (barra inferiore) ===
-  // Barra nera
-  tft.fillRect(0, 116, 128, 12, ST77XX_BLACK);
-
-  // STATS
-  tft.setTextColor(ST77XX_WHITE);
-  tft.drawRect(0, 116, 42, 12, ST77XX_WHITE);
-  tft.setCursor(6, 118);
-  tft.print("STATS");
-
-  // HOME (selezionato)
-  tft.fillRect(43, 116, 42, 12, ST77XX_WHITE);
-  tft.setTextColor(ST77XX_BLACK);
-  tft.setCursor(52, 118);
-  tft.print("HOME");
-
-  // CRONO
-  tft.setTextColor(ST77XX_WHITE);
-  tft.drawRect(86, 116, 42, 12, ST77XX_WHITE);
-  tft.setCursor(92, 118);
-  tft.print("CRONO");
-}
-
-
-#ifdef test
 static void smartdelay(unsigned long ms)
 {
   unsigned long start = millis();
@@ -231,4 +134,3 @@ static void print_str(const char *str, int len)
     Serial.print(i<slen ? str[i] : ' ');
   smartdelay(0);
 }
-#endif
