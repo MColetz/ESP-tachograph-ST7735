@@ -25,7 +25,7 @@ void setup() {
   static Chrono chrono{&tft, &gps};
   static std::array<Tab*, 3> tabs{&stat, &home, &chrono};
   Serial.println("init display");
-  d = Display{tabs, &tft};
+  d = Display{tabs, &tft, &gps};
    
   ss.begin(9600);
   Serial.println("init done");
@@ -58,7 +58,6 @@ void loop() {
   print_int(failed, 0xFFFFFFFF, 9);
   Serial.println();
   smartdelay(100);
-
   d.update_data();
 }
 
