@@ -1,6 +1,7 @@
 #include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
 #include <array>
 #include <TinyGPS.h>
+#include "bitmaps.h"
 
 class Tab {
   protected:
@@ -115,7 +116,7 @@ class Chrono : public Tab {
       lcd->fillRect(86, 116, 42, 12, ST77XX_WHITE);
       lcd->setTextColor(ST77XX_BLACK);
       lcd->setCursor(92, 118);
-      lcd->print("CRONO");
+      lcd->print("CHRONO");
   }
 
   void set_inactive() {
@@ -124,7 +125,7 @@ class Chrono : public Tab {
       lcd->drawRect(86, 116, 42, 12, ST77XX_WHITE);
       lcd->setTextColor(ST77XX_WHITE);
       lcd->setCursor(92, 118);
-      lcd->print("CRONO");
+      lcd->print("CHRONO");
   }
 }; 
 
@@ -143,13 +144,17 @@ class Display {
     current_tab_idx = 1;	
     maxgps_speed = 0;
     //TOP INIT
-    _init_top_bar();
+    delay(200);
+    lcd->drawBitmap(0, 12, piaggio_ciao_bitmap, 128, 100, ST77XX_WHITE);
+    delay(2000);
 
+    _init_top_bar();
     // FOOTER INIT
     lcd->fillRect(0, 116, 128, 12, ST77XX_BLACK);
     for(auto tab:tabs){
       tab->set_inactive();
     }
+    changeState(1); 
     // footer init
 	}
 
@@ -190,6 +195,7 @@ class Display {
     lcd->setCursor(66, 2);
     lcd->print("Max: "); //X in [66; 96] Y in [2;10]
     lcd->print(maxgps_speed, 1); //X in [96;120] (4 digit 24 px) Y in [2;10]
+    delay(10000);//TEST
   }
 
   void _update_top_bar(){

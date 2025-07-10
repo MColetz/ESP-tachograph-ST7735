@@ -18,6 +18,7 @@ void setup() {
   Serial.begin(115200);
   Serial.println("init display chip");
   tft.initR(INITR_BLACKTAB);      // Init ST7735S chip, black tab
+  //if you have screen shift, change in the Adafruit_ST77xx.h at line 107/108 _colstart and  _rowstart
   tft.fillScreen(ST77XX_BLACK);
   Serial.println("init tabs");
   static Home home{&tft, &gps};
