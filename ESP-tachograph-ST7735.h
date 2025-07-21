@@ -4,6 +4,7 @@
 #include <array>
 #include <TinyGPS.h>
 #include "bitmaps.h"
+#include "SmartLcdPrint.h"
 
 // Forward declarations
 class Tab;
@@ -38,6 +39,7 @@ class Home : public Tab {
     LcdReadout* speed_readout;
     LcdFormattedReadout* altitude_readout;
     LcdFormattedReadout* course_readout;
+    LcdLabel* kmh_label; // Add member variable
 };
 
 class Stat : public Tab {
@@ -117,4 +119,3 @@ class Display {
 };
 
 
- 

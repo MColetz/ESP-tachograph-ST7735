@@ -186,4 +186,15 @@ int LcdFormattedReadout::calculate_digits_needed(float value) {
   return digits;
 }
 
+// LcdLabel implementation
+LcdLabel::LcdLabel(Adafruit_ST7735* lcd, int x, int y, int text_size, uint16_t color, const char* text)
+    : lcd(lcd), x(x), y(y), text_size(text_size), color(color), text(text) {}
+
+void LcdLabel::draw() {
+    lcd->setTextSize(text_size);
+    lcd->setTextColor(color);
+    lcd->setCursor(x, y);
+    lcd->print(text);
+}
+
 

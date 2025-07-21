@@ -1,5 +1,6 @@
 #include <SoftwareSerial.h>
 #include "ESP-tachograph-ST7735.h"
+#include "SmartLcdPrint.h" // Ensure this file is included in the build
 
 static TinyGPS gps;
 static SoftwareSerial ss(0, 2);

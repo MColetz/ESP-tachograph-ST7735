@@ -64,3 +64,17 @@ class LcdFormattedReadout {
       void calculate_layout();
       int calculate_digits_needed(float value);
 };
+
+
+class LcdLabel {
+    private:
+        Adafruit_ST7735* lcd;
+        int x, y;
+        int text_size;
+        uint16_t color;
+        const char* text;
+
+    public:
+        LcdLabel(Adafruit_ST7735* lcd, int x, int y, int text_size, uint16_t color, const char* text);
+        void draw();
+};
