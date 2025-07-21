@@ -1,7 +1,9 @@
 #include "SmartLcdPrint.h"
 
-LcdReadout::LcdReadout(Adafruit_ST7735* lcd, int x, int y, int text_size, int precision, float start_value, int width, int height)
-  : lcd(lcd), x(x), y(y), text_size(text_size), precision(precision), last_value(start_value), width(width), height(height), default_color(ST77XX_WHITE) {
+#define INVALID_CHAR '#'
+
+LcdReadout::LcdReadout(Adafruit_ST7735* lcd, int x, int y, int text_size, int precision, float start_value, int width, int height, float invalid_value)
+  : lcd(lcd), x(x), y(y), text_size(text_size), precision(precision), last_value(start_value), width(width), height(height), default_color(ST77XX_WHITE), invalid_value(invalid_value) {
     if (!isnan(start_value)) {
       print_value(start_value);
     }
@@ -27,12 +29,18 @@ void LcdReadout::print_value(float value, uint16_t color) {
   lcd->setTextSize(text_size);
   lcd->setTextColor(color);
   lcd->setCursor(x, y);
-  lcd->print(value, precision);
+  if (value == invalid_value) {
+    for (int i = 0; i < width / (6 * text_size); i++) { // Fill width with INVALID_CHAR
+      lcd->print(INVALID_CHAR);
+    }
+  } else {
+    lcd->print(value, precision);
+  }
 }
 
 // LcdFormattedReadout implementation
-LcdFormattedReadout::LcdFormattedReadout(Adafruit_ST7735* lcd, int x, int y, int text_size, int precision, int max_digits, const char* prefix, const char* suffix, float start_value)
-  : lcd(lcd), x(x), y(y), text_size(text_size), precision(precision), last_value(start_value), default_color(ST77XX_WHITE), max_digits(max_digits) {
+LcdFormattedReadout::LcdFormattedReadout(Adafruit_ST7735* lcd, int x, int y, int text_size, int precision, int max_digits, const char* prefix, const char* suffix, float start_value, float invalid_value)
+  : lcd(lcd), x(x), y(y), text_size(text_size), precision(precision), last_value(start_value), default_color(ST77XX_WHITE), max_digits(max_digits), invalid_value(invalid_value) {
   
   // Allocate memory for prefix and suffix
   this->prefix = new char[strlen(prefix) + 1];
@@ -89,8 +97,14 @@ void LcdFormattedReadout::print_full_string(float value, uint16_t color) {
   // Print prefix
   lcd->print(prefix);
   
-  // Print value
-  lcd->print(value, precision);
+  // Print value or INVALID_CHAR if invalid
+  if (value == invalid_value) {
+    for (int i = 0; i < max_digits; i++) {
+      lcd->print(INVALID_CHAR);
+    }
+  } else {
+    lcd->print(value, precision);
+  }
   
   // Print suffix at fixed position
   lcd->setCursor(suffix_start_x, y);
@@ -106,12 +120,24 @@ void LcdFormattedReadout::update_value_only(float value, uint16_t color) {
   lcd->setTextSize(text_size);
   lcd->setTextColor(ST77XX_BLACK);
   lcd->setCursor(value_start_x, y);
-  lcd->print(last_value, precision);
+  if (last_value == invalid_value) {
+    for (int i = 0; i < max_digits; i++) {
+      lcd->print(INVALID_CHAR);
+    }
+  } else {
+    lcd->print(last_value, precision);
+  }
   
   // Print new value in the specified color
   lcd->setTextColor(color);
   lcd->setCursor(value_start_x, y);
-  lcd->print(value, precision);
+  if (value == invalid_value) {
+    for (int i = 0; i < max_digits; i++) {
+      lcd->print(INVALID_CHAR);
+    }
+  } else {
+    lcd->print(value, precision);
+  }
 }
 
 void LcdFormattedReadout::calculate_layout() {
@@ -161,4 +187,3 @@ int LcdFormattedReadout::calculate_digits_needed(float value) {
 }
 
 
-  

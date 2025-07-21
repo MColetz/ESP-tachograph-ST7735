@@ -2,9 +2,9 @@
 #include "SmartLcdPrint.h"
 
 Home::Home(Adafruit_ST7735* lcd, TinyGPS* gps) : Tab(lcd, gps) {
-    speed_readout = new LcdReadout(lcd, 24, 37, 3, 1, NAN, 60, 24); 
-    altitude_readout = new LcdFormattedReadout(lcd, 11, 68, 2, 0, 3, "Alt:", " m", NAN);
-    course_readout = new LcdFormattedReadout(lcd, 11, 88, 2, 0, 3, "Crs:", "", NAN);
+    speed_readout = new LcdReadout(lcd, 24, 37, 3, 1, NAN, 60, 24, TinyGPS::GPS_INVALID_F_SPEED); 
+    altitude_readout = new LcdFormattedReadout(lcd, 11, 68, 2, 0, 3, "Alt:", " m", NAN, TinyGPS::GPS_INVALID_F_ALTITUDE);
+    course_readout = new LcdFormattedReadout(lcd, 11, 88, 2, 0, 3, "Crs:", "", NAN, TinyGPS::GPS_INVALID_F_ANGLE);
 }
 
 void Home::set_active() {

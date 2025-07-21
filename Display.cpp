@@ -9,8 +9,8 @@ Display::Display(std::array<Tab*, 3> my_tabs, Adafruit_ST7735* lcd, TinyGPS* gps
     active_tab = tabs[current_tab_idx];
     maxgps_speed = 0;
 
-    satellites_readout = new LcdFormattedReadout(lcd, 5, 2, 1, 0, 2, "Sats:", "", NAN);
-    max_speed_readout = new LcdFormattedReadout(lcd, 68, 2, 1, 1, 4, "Max:", "", NAN);
+    satellites_readout = new LcdFormattedReadout(lcd, 5, 2, 1, 0, 2, "Sats:", "", NAN, TinyGPS::GPS_INVALID_SATELLITES);
+    max_speed_readout = new LcdFormattedReadout(lcd, 68, 2, 1, 1, 4, "Max:", "", NAN, TinyGPS::GPS_INVALID_F_SPEED);
     
     //TOP INIT
     delay(200);
@@ -82,4 +82,4 @@ void Display::_update_top_bar(){
     // Refresh displays
     satellites_readout->refresh(satellites);
     max_speed_readout->refresh(maxgps_speed);
-} 
+}

@@ -4,9 +4,9 @@
 
 Chrono::Chrono(Adafruit_ST7735* lcd, TinyGPS* gps) : Tab(lcd, gps) {
     // Initialize display elements for home navigation
-    distance_readout = new LcdFormattedReadout(lcd, 10, 30, 2, 1, 5, "Dist:", " km", NAN);
-    bearing_readout = new LcdFormattedReadout(lcd, 10, 60, 2, 0, 3, "Dir:", " °", NAN);
-    eta_readout = new LcdFormattedReadout(lcd, 10, 90, 2, 0, 4, "ETA:", " min", NAN);
+    distance_readout = new LcdFormattedReadout(lcd, 10, 30, 2, 1, 5, "Dist:", " km", NAN, NAN);
+    bearing_readout = new LcdFormattedReadout(lcd, 10, 60, 2, 0, 3, "Dir:", " °", NAN, TinyGPS::GPS_INVALID_F_ANGLE);
+    eta_readout = new LcdFormattedReadout(lcd, 10, 90, 2, 0, 4, "ETA:", " min", NAN, NAN);
 }
 
 Chrono::~Chrono() {
@@ -128,4 +128,4 @@ float Chrono::calculate_eta_to_home() {
     float eta_minutes = eta_hours * 60.0;
     
     return eta_minutes;
-} 
+}

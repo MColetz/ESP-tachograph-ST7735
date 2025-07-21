@@ -4,10 +4,10 @@
 
 Stat::Stat(Adafruit_ST7735* lcd, TinyGPS* gps) : Tab(lcd, gps) {
     // Initialize display elements
-    mean_speed_readout = new LcdFormattedReadout(lcd, 10, 20, 2, 1, 4, "Avg:", " km/h", NAN);
-    total_distance_readout = new LcdFormattedReadout(lcd, 10, 45, 2, 1, 5, "Dist:", " km", NAN);
-    total_time_readout = new LcdFormattedReadout(lcd, 10, 70, 2, 0, 6, "Time:", "", NAN);
-    current_speed_readout = new LcdFormattedReadout(lcd, 10, 95, 2, 1, 4, "Now:", " km/h", NAN);
+    mean_speed_readout = new LcdFormattedReadout(lcd, 10, 20, 1, 1, 4, "Avg:", " km/h", NAN, TinyGPS::GPS_INVALID_F_SPEED);
+    total_distance_readout = new LcdFormattedReadout(lcd, 10, 45, 1, 1, 5, "Dist:", " km", NAN, NAN);
+    total_time_readout = new LcdFormattedReadout(lcd, 10, 70, 1, 0, 6, "Time:", "", NAN, NAN);
+    current_speed_readout = new LcdFormattedReadout(lcd, 10, 95, 1, 1, 4, "Now:", " km/h", NAN, TinyGPS::GPS_INVALID_F_SPEED);
     
     // Initialize statistics variables
     reset_stats();
@@ -22,13 +22,7 @@ Stat::~Stat() {
 
 void Stat::set_active() {
     _set_footer_active();
-    
-    // Draw title
-    lcd->setTextSize(2);
-    lcd->setTextColor(ST77XX_WHITE);
-    lcd->setCursor(25, 2);
-    lcd->print("STATS");
-    
+
     // Initialize displays with current values
     update_stats();
     mean_speed_readout->print_full_string(sum_speeds / (speed_readings > 0 ? speed_readings : 1));
@@ -138,4 +132,4 @@ void Stat::set_inactive() {
     lcd->setTextColor(ST77XX_WHITE);
     lcd->setCursor(6, 118);
     lcd->print("STATS");
-} 
+}
