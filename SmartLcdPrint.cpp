@@ -30,27 +30,6 @@ void LcdReadout::print_value(float value, uint16_t color) {
   lcd->print(value, precision);
 }
 
-// LcdBoxedReadout implementation
-LcdBoxedReadout::LcdBoxedReadout(Adafruit_ST7735* lcd, int x, int y, int text_size, int precision, float start_value, int width, int height, int border_width, uint16_t box_color)
-  : LcdReadout(lcd, x, y, text_size, precision, start_value, width, height), box_color(box_color), border_width(border_width) {
-  draw_box();
-}
-
-void LcdBoxedReadout::set_box_color(uint16_t color) {
-  box_color = color;
-  draw_box();
-}
-
-void LcdBoxedReadout::draw_box() {
-  
-  int box_x = get_x() - border_width;
-  int box_y = get_y() - border_width;
-  int box_width = get_width() + 2 * border_width;
-  int box_height = get_height() + 2 * border_width;
-  
-  get_lcd()->drawRect(box_x, box_y, box_width, box_height, box_color);
-}
-
 // LcdFormattedReadout implementation
 LcdFormattedReadout::LcdFormattedReadout(Adafruit_ST7735* lcd, int x, int y, int text_size, int precision, int max_digits, const char* prefix, const char* suffix, float start_value)
   : lcd(lcd), x(x), y(y), text_size(text_size), precision(precision), last_value(start_value), default_color(ST77XX_WHITE), max_digits(max_digits) {
