@@ -11,6 +11,25 @@ A GPS-based tachograph system built with ESP8266, featuring a 128x160 ST7735 TFT
 - **Maximum Speed Tracking**: Records and displays the highest speed achieved
 - **Compact Design**: 128x160 pixel display with efficient UI layout
 
+## Project Structure
+
+The project has been refactored into separate header and implementation files for better code organization:
+
+```
+ESP-tachograph-ST7735/
+├── ESP-tachograph-ST7735.ino    # Main Arduino sketch file
+├── ESP-tachograph-ST7735.h      # Header file with class declarations
+├── Tab.cpp                      # Base Tab class implementation
+├── Home.cpp                     # Home tab implementation
+├── Stat.cpp                     # Stats tab implementation
+├── Chrono.cpp                   # Chrono tab implementation
+├── Display.cpp                  # Display manager implementation
+├── SmartLcdPrint.h              # LcdReadout class header
+├── SmartLcdPrint.cpp            # LcdReadout class implementation
+├── bitmaps.h                    # Bitmap data for graphics
+└── README.md                    # This file
+```
+
 ## Hardware Requirements
 
 | Component | Model/Type | Quantity |
@@ -84,3 +103,16 @@ A GPS-based tachograph system built with ESP8266, featuring a 128x160 ST7735 TFT
    - Select your ESP8266 board from Tools → Board
    - Select the correct COM port
    - Click Upload
+
+## Code Architecture
+
+The project uses an object-oriented approach with the following classes:
+
+- **Tab**: Abstract base class for all display tabs
+- **Home**: Displays current speed and basic information
+- **Stat**: Shows statistics and historical data
+- **Chrono**: Timer and chronometer functionality
+- **Display**: Manages the overall display and tab switching
+- **LcdReadout**: Smart display component for efficient value updates
+
+All implementation files are automatically compiled by the Arduino IDE when they are in the same directory as the main `.ino` file.
