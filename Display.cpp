@@ -8,16 +8,15 @@ Display::Display(std::array<Tab*, 3> my_tabs, Adafruit_ST7735* lcd, TinyGPS* gps
     current_tab_idx = 1;	
     active_tab = tabs[current_tab_idx];
     maxgps_speed = 0;
-    
-    // Initialize top bar readouts
-    satellites_readout = new LcdFormattedReadout(lcd, 2, 2, 1, 0, 2, "Sats:", "", NAN);
-    max_speed_readout = new LcdFormattedReadout(lcd, 66, 2, 1, 1, 4, "Max:", "", NAN);
+
+    satellites_readout = new LcdFormattedReadout(lcd, 5, 2, 1, 0, 2, "Sats:", "", NAN);
+    max_speed_readout = new LcdFormattedReadout(lcd, 68, 2, 1, 1, 4, "Max:", "", NAN);
     
     //TOP INIT
     delay(200);
     lcd->drawBitmap(0, 12, piaggio_ciao_bitmap, 128, 100, ST77XX_WHITE);
     delay(2000);
-
+    
     _init_top_bar();
     // FOOTER INIT
     lcd->fillRect(0, 116, 128, 12, ST77XX_BLACK);
@@ -35,9 +34,10 @@ Display::~Display() {
 
 void Display::changeState(int idx) {
     //EMPTY SCREEN
-    lcd->fillRect(0, 0, 124, 115, ST77XX_BLACK);
+    lcd->fillRect(0, 13, 128, 103, ST77XX_BLACK);
 
     active_tab->set_inactive();
+    
     active_tab = tabs[idx];
     current_tab_idx = idx;
     active_tab->set_active();        
@@ -60,7 +60,7 @@ void Display::_init_top_bar(){
     //HOME LAYOUT
     lcd->fillRect(0, 0, 128, 12, ST77XX_BLACK);
     lcd->drawRect(0, 0, 64, 12, ST77XX_WHITE);
-    lcd->drawRect(64, 0, 64, 12, ST77XX_WHITE);
+    lcd->drawRect(63, 0, 65, 12, ST77XX_WHITE);
 
     // Initialize the readouts with current values
     satellites_readout->print_full_string(0);

@@ -30,7 +30,6 @@ void setup() {
    
   ss.begin(9600);
   Serial.println("init done");
-  d.changeState(1);
   Serial.println("Sats HDOP Latitude  Longitude  Fix  Date       Time     Date Alt    Course Speed Card  Chars Sentences Checksum");
   Serial.println("          (deg)     (deg)      Age                      Age  (m)    --- from GPS ----  RX    RX        Fail");
   Serial.println("----------------------------------------------------------------------------------------------------------------");
@@ -58,8 +57,15 @@ void loop() {
   print_int(sentences, 0xFFFFFFFF, 10);
   print_int(failed, 0xFFFFFFFF, 9);
   Serial.println();
-  smartdelay(100);
-  d.update_data();
+
+  //FOR DEBUG
+  d.changeState(1); 
+  smartdelay(5000);
+  d.changeState(2); 
+  smartdelay(5000);
+  d.changeState(0); 
+  smartdelay(5000);
+  //d.update_data();
 }
 
 static void smartdelay(unsigned long ms)
